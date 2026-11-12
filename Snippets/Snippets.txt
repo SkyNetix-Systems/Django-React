@@ -1,0 +1,144 @@
+Installed Apps Section
+------------------------
+	# Custom Apps
+   	 'api',
+   	 'core',
+    	'student',
+   	'teacher',
+    	'userauths',
+
+	# Third Party Apps
+	'rest_framework',
+    	'rest_framework_simplejwt.token_blacklist',
+    	'corsheaders',
+    	'anymail',
+    	'storages',
+   	'django_ckeditor_5',
+
+
+MIDDLEWARE Section
+-----------------------------
+# Add CORSHeader Below
+'corsheaders.middleware.CorsMiddleware',
+
+JWT Configuration
+------------------------
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=50),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+
+# Set coresheader to allow all origin
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+
+
+#DRF-YASG Documentation Code Snippet (In Project urls.py)
+# drf-yasg imports
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="E-commerce Backend APIs",
+      default_version='v1',
+      description="This is the API documentation for Desphixs LMS project APIs",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="destiny@gmail.com"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
+
+urlpatterns = [
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    
+    # Other URLs
+    ...
+]
+
+
+
+
+
+
+Get User Country Endpoint
+-------------------------
+https://nominatim.openstreetmap.org/reverse?format=json&lat=<lat-here>&lon=<lon-here>
+
+
+
+
+PayPal Payment With React.js
+---------------------------------
+const initialOptions = {
+     clientId: PAYPAL_CLIENT_ID,
+     currency: "USD",
+     intent: "capture",
+};
+
+<PayPalScriptProvider options={initialOptions}>
+    <PayPalButtons className='mt-3'
+        createOrder={(data, actions) => {
+            return actions.order.create({
+                purchase_units: [
+                    {
+                        amount: {
+                            currency_code: "USD",
+                            value: 100
+                        }
+                    }
+                ]
+            })
+        }}
+
+        onApprove={(data, actions) => {
+            return actions.order.capture().then((details) => {
+                const name = details.payer.name.given_name;
+                const status = details.status;
+                const paypal_order_id = data.orderID;
+
+                console.log(status);
+                if (status === "COMPLETED") {
+                    navigate(`success-url`)
+                }
+            })
+        }}
+    />
+</PayPalScriptProvider>
